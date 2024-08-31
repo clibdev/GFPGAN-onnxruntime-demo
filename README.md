@@ -1,27 +1,40 @@
-# GFPGAN-onnxruntime-demo
-This is the onnxruntime inference code for  GFP-GAN: Towards Real-World Blind Face Restoration with Generative Facial Prior (CVPR 2021). Official code: https://github.com/TencentARC/GFPGAN
+# Fork of [xuanandsix/GFPGAN-onnxruntime-demo](https://github.com/xuanandsix/GFPGAN-onnxruntime-demo)
 
-## The following issues are addressed：
-1、noise = out.new_empty(b, 1, h, w).normal_() in stylegan2_clean_arch.py can‘t be supported in ONNX. I move it out the Model class, like noise = Noise[i], the Noise is a list or others which prestores generated random noise.
+Differences between original repository and fork:
 
-2、the forward function of Model is very bad, especially stylegan, so many " if else " and class be reused. Like the StyleConv " in "useself.style_convs.append StyleConv ...". So I rewrite and make it in single forward.
+* Compatibility with PyTorch >=2.4. (🔥)
+* Original pretrained models and converted ONNX models from GitHub [releases page](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases). (🔥)
+* Installation with [requirements.txt](requirements.txt) file.
+* Simplified [torch2onnx.py](torch2onnx.py) file.
+* The following warnings has been fixed:
+  * FutureWarning: You are using 'torch.load' with 'weights_only=False'.
 
-## convert torch to onnx.
-```
-wget https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth
+# Installation
 
-python torch2onnx.py  --src_model_path ./GFPGANv1.3.pth --dst_model_path ./GFPGANv1.3.onnx --img_size 512 
-```
-
-## run onnx demo.
-```
-python demo_onnx.py --model_path GFPGANv1.3.onnx --image_path ./cropped_faces/Adele_crop.png --save_path Adele_v3.jpg
+```shell
+pip install -r requirements.txt
 ```
 
-| input | output|
-| :-: |:-:|
-|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/cropped_faces/Justin_Timberlake_crop.png" height="80%" width="80%">|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/imgs/Justin_Timberlake_v2.jpg" height="80%" width="80%">|
-|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/cropped_faces/Julia_Roberts_crop.png" height="80%" width="80%">|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/imgs/Julia_Roberts_v2.jpg" height="80%" width="80%">|
-|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/cropped_faces/Paris_Hilton_crop.png" height="80%" width="80%">|<img src="https://github.com/xuanandsix/GFPGAN-onnxruntime-demo/raw/main/imgs/Paris_Hilton_v2.jpg" height="80%" width="80%">|
+# Pretrained models
 
+| Name       | Link                                                                                                                                                                                                       |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GFPGANv1.2 | [PyTorch](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.2.pth), [ONNX](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.2.onnx) |
+| GFPGANv1.3 | [PyTorch](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.3.pth), [ONNX](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.3.onnx) |
+| GFPGANv1.4 | [PyTorch](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.4.pth), [ONNX](https://github.com/clibdev/GFPGAN-onnxruntime-demo/releases/latest/download/GFPGANv1.4.onnx) |
 
+# Export to ONNX format
+
+```shell
+python torch2onnx.py  --src_model_path GFPGANv1.2.pth --dst_model_path GFPGANv1.2.onnx
+python torch2onnx.py  --src_model_path GFPGANv1.3.pth --dst_model_path GFPGANv1.3.onnx
+python torch2onnx.py  --src_model_path GFPGANv1.4.pth --dst_model_path GFPGANv1.4.onnx
+```
+
+# Inference
+
+```shell
+python demo_onnx.py --model_path GFPGANv1.2.onnx --image_path cropped_faces/Justin_Timberlake_crop.png --save_path output1.2.png
+python demo_onnx.py --model_path GFPGANv1.3.onnx --image_path cropped_faces/Justin_Timberlake_crop.png --save_path output1.3.png
+python demo_onnx.py --model_path GFPGANv1.3.onnx --image_path cropped_faces/Justin_Timberlake_crop.png --save_path output1.4.png
+```
